@@ -1,0 +1,23 @@
+{
+  "name": "simple-crud-api",
+  "version": "1.0.0",
+  "description": "Simple CRUD API using in-memory database underneath",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gsidnick/simple-crud-api.git"
+  },
+  "keywords": [
+    "nodejs",
+    "crud",
+    "api"
+  ],
+  "author": "Nikolay Sidorenko",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gsidnick/simple-crud-api/issues"
+  },
+  "homepage": "https://github.com/gsidnick/simple-crud-api#readme"
+}
