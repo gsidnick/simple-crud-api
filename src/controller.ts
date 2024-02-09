@@ -118,8 +118,51 @@ const addUser = ({ req, res }: ControllerProps): void => {
   });
 };
 
+const updateUser = ({ req, res, params }: ControllerProps): void => {
+  let data = '';
+  let id: string = '';
+  if (params) id = params.id;
+
+  if (id && !UUID_PATTERN.test(id)) {
+    res.statusCode = 400;
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.end('400 Bad Request');
+    return;
+  }
+
+  const records = db.filter((item) => item.id === id);
+
+  if (records.length === 0) {
+    res.statusCode = 404;
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.end('404 Not Found');
+    return;
+  }
+
+  req.on('data', (chunk) => {
+    data += chunk;
+  });
+
+  req.on('end', () => {
+    const [user] = records;
+    const body = { ...user, ...JSON.parse(data) };
+
+    db.push(body);
+
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.end(JSON.stringify(body));
+  });
+
+  req.on('error', () => {
+    res.statusCode = 500;
+    res.end('500 Internal Server Error');
+  });
+};
+
 export default {
   getUsers,
   getUser,
   addUser,
+  updateUser,
 };
