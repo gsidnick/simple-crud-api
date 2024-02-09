@@ -160,9 +160,38 @@ const updateUser = ({ req, res, params }: ControllerProps): void => {
   });
 };
 
+const deleteUser = ({ res, params }: ControllerProps): void => {
+  let id: string = '';
+  if (params) id = params.id;
+
+  if (id && !UUID_PATTERN.test(id)) {
+    res.statusCode = 400;
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.end('400 Bad Request');
+    return;
+  }
+
+  const records = db.filter((item) => item.id === id);
+
+  if (records.length === 0) {
+    res.statusCode = 404;
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.end('404 Not Found');
+    return;
+  }
+
+  db.forEach((item, index) => {
+    if (item.id === id) db.splice(index, 1);
+  });
+
+  res.statusCode = 204;
+  res.end();
+};
+
 export default {
   getUsers,
   getUser,
   addUser,
   updateUser,
+  deleteUser,
 };
