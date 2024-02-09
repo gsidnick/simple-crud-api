@@ -28,6 +28,12 @@ npm run start:dev
 npm run start:prod
 ```
 
+### Run server in multi mode
+
+```
+npm run start:multi
+```
+
 ### Run server tests
 
 ```
