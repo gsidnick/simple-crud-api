@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Users, ControllerProps } from './types';
 import { UUID_PATTERN } from './constants';
-import db from './db';
+import database from './database';
 
 const isJSON = (data: string): boolean => {
   try {
@@ -56,7 +56,7 @@ const isUser = (data: string): boolean => {
 };
 
 const getUsers = ({ res }: ControllerProps): void => {
-  const users: Users = db;
+  const users: Users = database.getUsers();
 
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -74,16 +74,15 @@ const getUser = ({ res, params }: ControllerProps): void => {
     return;
   }
 
-  const records = db.filter((item) => item.id === id);
+  const user = database.getUser(id);
 
-  if (records.length === 0) {
+  if (user === null) {
     res.statusCode = 404;
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.end('404 Not Found');
     return;
   }
 
-  const [user] = records;
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   res.end(JSON.stringify(user));
@@ -106,7 +105,7 @@ const addUser = ({ req, res }: ControllerProps): void => {
 
     const newUser = { id: uuidv4(), ...JSON.parse(data) };
 
-    db.push(newUser);
+    database.addUser(newUser);
 
     res.statusCode = 201;
     res.end(JSON.stringify(newUser));
@@ -130,9 +129,9 @@ const updateUser = ({ req, res, params }: ControllerProps): void => {
     return;
   }
 
-  const records = db.filter((item) => item.id === id);
+  const user = database.getUser(id);
 
-  if (records.length === 0) {
+  if (user === null) {
     res.statusCode = 404;
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.end('404 Not Found');
@@ -144,14 +143,13 @@ const updateUser = ({ req, res, params }: ControllerProps): void => {
   });
 
   req.on('end', () => {
-    const [user] = records;
-    const body = { ...user, ...JSON.parse(data) };
+    const updatedUser = { ...user, ...JSON.parse(data) };
 
-    db.push(body);
+    database.updateUser(updatedUser);
 
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    res.end(JSON.stringify(body));
+    res.end(JSON.stringify(updatedUser));
   });
 
   req.on('error', () => {
@@ -171,18 +169,16 @@ const deleteUser = ({ res, params }: ControllerProps): void => {
     return;
   }
 
-  const records = db.filter((item) => item.id === id);
+  const user = database.getUser(id);
 
-  if (records.length === 0) {
+  if (user === null) {
     res.statusCode = 404;
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.end('404 Not Found');
     return;
   }
 
-  db.forEach((item, index) => {
-    if (item.id === id) db.splice(index, 1);
-  });
+  database.deleteUser(id);
 
   res.statusCode = 204;
   res.end();
